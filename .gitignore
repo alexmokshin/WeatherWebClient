@@ -4,7 +4,7 @@
 
 /.vs/*
 /WeatherWebApplication/bin/Debug/*
-WeatherWebApplication/obj/*
+/WeatherWebApplication/obj/*
 /WeatherWebApplication.sln.DotSettings.user
 
 

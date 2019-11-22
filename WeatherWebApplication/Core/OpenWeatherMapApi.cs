@@ -12,24 +12,23 @@ namespace WeatherWebApplication.Core
 {
     public class OpenWeatherMapApi : WeatherApi
     {
-        public OpenWeatherMapApi()
+        public OpenWeatherMapApi() : base()
         {
+            this.WeatherServiceName = "OpenWeatherMap";
             this.Token = "9b70f4ad5c7d79452694701a8d81c1b3";
-            this.Uri = "http://api.openweathermap.org/data/2.5/weather";
+            this.Url = new Uri("http://api.openweathermap.org/data/2.5/weather");
         }
 
         public override async Task<Forecast> GetForecastOnDay(Models.City city)
         {
-            if (city == null)
-                throw new Exception("City is not be null");
-
             var forecast = new Models.Forecast();
-            forecast.city = city;
+            forecast.city = city ?? throw new Exception("City is not be null");
+            forecast.WeatherApi = this;
 
             using (HttpClient client = new HttpClient())
             {
                 using (HttpResponseMessage response =
-                    await client.GetAsync(this.Uri + "?q=" + city.Name + "&units=metric&appid=" + this.Token))
+                    await client.GetAsync(this.Url + "?q=" + city.Name + "&units=metric&appid=" + this.Token))
                 {
                     if (response.IsSuccessStatusCode)
                     {

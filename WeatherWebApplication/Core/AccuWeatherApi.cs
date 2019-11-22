@@ -11,10 +11,12 @@ namespace WeatherWebApplication.Core
 {
     public class AccuWeatherApi : WeatherApi
     {
-        public AccuWeatherApi()
+        public AccuWeatherApi() : base()
         {
+            this.WeatherServiceName = "AccuWeather";
             this.Token = "A1lsqa8gB6LC3N58eWhrOQA3U4zeLUZ4";
-            this.Uri = "http://dataservice.accuweather.com";
+            this.Url = new Uri("http://dataservice.accuweather.com");
+            
         }
 
         public override async Task<Forecast> GetForecastOnDay(City city)
@@ -24,9 +26,12 @@ namespace WeatherWebApplication.Core
 
             Forecast forecast = new Forecast();
             forecast.city = city;
+            forecast.WeatherApi = this;
             string cityLocationNumber = GetCityNumber(city).Result;
+            
             using (HttpClient client = new HttpClient())
             {
+                
                 using (HttpResponseMessage response =
                     await client.GetAsync(GetForecastUri(cityLocationNumber)))
                 {
@@ -46,17 +51,19 @@ namespace WeatherWebApplication.Core
             return forecast;
         }
 
-        private string GetForecastUri(string cityNumber)
+        private Uri GetForecastUri(string cityNumber)
         {
-            return $"{this.Uri}/currentconditions/v1/{cityNumber}?apikey={this.Token}&details=true";
+            
+            return new Uri($"{this.Url}/currentconditions/v1/{cityNumber}?apikey={this.Token}&details=true");
+            
         }
 
-        private string GetAccuWeatherCityNumberUri(City city)
+        private Uri GetAccuWeatherCityNumberUri(City city)
         {
             if (city == null)
                 throw new Exception("City is not be null");
 
-            return $"{this.Uri}/locations/v1/cities/search?apikey={this.Token}&q={city.Name}&offset=1";
+            return new Uri($"{this.Url}/locations/v1/cities/search?apikey={this.Token}&q={city.Name}&offset=1");
         }
 
         

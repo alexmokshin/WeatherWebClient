@@ -8,13 +8,13 @@ namespace Tests
 {
     public class Tests
     {
-        public City city = new City() { Name = "Yekaterinburg" };
+        public City city = new City() { Name = "Sevastopol" };
         [SetUp]
         public void Setup()
         {
         }
 
-        [Test]
+       [Test]
         public void TestOpenWeatherMapApi()
         {
             WeatherApi api = new OpenWeatherMapApi();
@@ -28,12 +28,22 @@ namespace Tests
         }
 
         [Test]
-        public void TestAccuWeatherApi()
+        public void TestAccuWeatherApi_GetCity()
         {
             var accuweatherApi = new AccuWeatherApi(); 
             
-            Forecast forecast = accuweatherApi.GetForecastOnDay(city).Result;
+            var cityNumber = accuweatherApi.GetCityNumber(city).Result;
             
+            Assert.IsNotEmpty(cityNumber);
+            Console.WriteLine(cityNumber);
+        }
+        [Test]
+        public void TestAccuWeatherApi_GetForecast()
+        {
+            var accuweatherApi = new AccuWeatherApi();
+
+            Forecast forecast = accuweatherApi.GetForecastOnDay(city).Result;
+
             Assert.NotZero(forecast.Temp);
             Assert.NotZero(forecast.Humidity);
             Assert.NotZero(forecast.Pressure);

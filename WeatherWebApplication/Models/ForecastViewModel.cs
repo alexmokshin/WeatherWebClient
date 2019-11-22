@@ -5,13 +5,9 @@ using System.Threading.Tasks;
 
 namespace WeatherWebApplication.Models
 {
-    public class City
+    public class ForecastViewModel
     {
-        public String Name { get; set; }
-
-        public String LocalName { get; set; }
-
-        public bool Selected { get; set; }
-
+        public List<City> cities { get; set; }
+        public List<WeatherService> weatherServices { get; set; }
     }
 }

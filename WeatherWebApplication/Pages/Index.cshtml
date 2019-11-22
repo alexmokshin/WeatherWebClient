@@ -1,10 +1,30 @@
-﻿@page
-@model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
+﻿@model Models.ForecastViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+
+<form asp-action="GetForecast" asp-controller="Home" method="post">
+    <ul>
+
+        @foreach (var city in Model.cities)
+        {
+            <li>
+                <input type="checkbox" asp-for="@city.Selected" id=@city.Name name=@city.Name />
+                <label asp-for="@city.LocalName">@city.LocalName</label>
+            </li>
+        }
+    </ul>
+
+    <ul>
+        @foreach (var p in Model.weatherServices)
+        {
+            <li>
+                <input type="checkbox" asp-for="@p.Selected" id=@p name=@p.WeatherApi.WeatherServiceName />
+                <label asp-for="@p.WeatherApi.WeatherServiceName">@p.WeatherApi.WeatherServiceName</label>
+            </li>
+        }
+    </ul>
+
+    <button type="submit">GetForecast</button>
+</form>
+
+

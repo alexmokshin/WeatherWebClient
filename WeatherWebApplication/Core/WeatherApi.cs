@@ -7,7 +7,7 @@ namespace WeatherWebApplication.Core
 {
     public abstract class WeatherApi
     {
-        public string Uri { get; set; }
+        public Uri Url { get; set; }
 
         public string WeatherServiceName { get; set; }
 

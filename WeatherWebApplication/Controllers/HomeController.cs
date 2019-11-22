@@ -4,21 +4,100 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WeatherWebApplication.Core;
+using WeatherWebApplication.Models;
 
 namespace WeatherWebApplication.Controllers
 {
     public class HomeController : Controller
     {
-        // GET: Home
-        public string Index()
+        private object Mutex = new object();
+        #region Testing values
+        List<City> Cities = new List<City>()
         {
-            Models.City city = new Models.City();
-            city.Name = "Moscow";
-            city.LocalName = "Москва";
-            Core.WeatherApi api = new Core.OpenWeatherMapApi();
-            var p = api.GetForecastOnDay(city).Result;
-            
-            return "Hello there";
+            new City()
+                {
+                    LocalName = "Москва",
+                    Name = "Moscow"
+                },
+                new City()
+                {
+                    LocalName = "Екатеринбург",
+                    Name = "Yekaterinburg"
+                },
+                new City()
+                {
+                    LocalName = "Лондон",
+                    Name = "London"
+                },
+                new City()
+                {
+                    LocalName = "Севастополь",
+                    Name = "Sevastopol"
+
+                }
+        };
+        List<WeatherService> WeatherServices = new List<WeatherService>()
+            {
+                new WeatherService()
+                {
+                    WeatherApi = new AccuWeatherApi()
+                },
+                new WeatherService()
+                {
+                    WeatherApi = new OpenWeatherMapApi()
+                }
+            };
+        #endregion
+        // GET: Home
+        public ActionResult Index()
+        {
+            ForecastViewModel forecastView = new ForecastViewModel()
+            {
+                cities = Cities,
+                weatherServices = WeatherServices
+            };
+
+            return View("\\Pages\\Index.cshtml", forecastView);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetForecast(Dictionary<string,bool> shit)
+        {
+            var result = shit.Where(item => item.Value == true);
+
+            List<Forecast> forecasts = new List<Forecast>();
+            List<City> selectedCities = new List<City>();
+            List<WeatherService> selectedServices = new List<WeatherService>();
+
+            foreach (var p in result)
+            {
+
+                var selectedCity = Cities.FindLast(city => city.Name == p.Key);
+                if (selectedCity == null)
+                {
+                    var selectedService = WeatherServices.FindLast(service => service.WeatherApi.WeatherServiceName == p.Key);
+                    selectedServices.Add(selectedService);
+                }
+                else
+                {
+                    selectedCities.Add(selectedCity);
+                }
+            }
+
+            foreach (var p in selectedCities)
+            {
+                foreach (var q in selectedServices)
+                {
+                    var forecast = await q.WeatherApi.GetForecastOnDay(p);
+                    lock (Mutex)
+                    {
+                        forecasts.Add(forecast);
+                    }
+                }
+            }
+
+            return PartialView("\\Pages\\Forecasts.cshtml", forecasts);
         }
 
         // GET: Home/Details/5
@@ -34,66 +113,6 @@ namespace WeatherWebApplication.Controllers
         }
 
         // POST: Home/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Home/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Home/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Home/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Home/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        
     }
 }

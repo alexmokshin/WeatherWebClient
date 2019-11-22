@@ -7,8 +7,8 @@ namespace WeatherWebApplication.Models
 {
     public class WeatherService
     {
-        public String Name { get; set; }
-
         public Core.WeatherApi WeatherApi { get; set; }
+
+        public bool Selected { get; set; }
     }
 }

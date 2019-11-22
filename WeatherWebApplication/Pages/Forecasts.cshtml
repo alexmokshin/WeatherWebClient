@@ -1,0 +1,25 @@
+﻿@model List<WeatherWebApplication.Models.Forecast>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Город</th>
+            <th>Сервис погоды</th>
+            <th>Температура</th>
+            <th>Давление</th>
+            <th>Влажность</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var forecast in Model)
+    {
+        <tr>
+            <td>@forecast.city.LocalName</td>
+            <td>@forecast.WeatherApi.WeatherServiceName</td>
+            <td>@forecast.Temp</td>
+            <td>@forecast.Pressure</td>
+            <td>@forecast.Humidity</td>
+        </tr>
+    }
+    </tbody>
+</table>
