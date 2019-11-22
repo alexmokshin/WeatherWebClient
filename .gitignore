@@ -2,9 +2,9 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs
-WeatherWebApplication/bin/Debug/
-/WeatherWebApplication/obj/
+/.vs/*
+/WeatherWebApplication/bin/Debug/*
+WeatherWebApplication/obj/*
 /WeatherWebApplication.sln.DotSettings.user
 
 
