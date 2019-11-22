@@ -8,16 +8,15 @@ namespace Tests
 {
     public class Tests
     {
+        public City city = new City() { Name = "Yekaterinburg" };
         [SetUp]
         public void Setup()
         {
         }
 
         [Test]
-        public void Test1()
+        public void TestOpenWeatherMapApi()
         {
-            City city = new City();
-            city.Name = "London";
             WeatherApi api = new OpenWeatherMapApi();
             var response = api.GetForecastOnDay(city).Result;
             Assert.IsNotNull(response);
@@ -27,5 +26,19 @@ namespace Tests
 
 
         }
+
+        [Test]
+        public void TestAccuWeatherApi()
+        {
+            var accuweatherApi = new AccuWeatherApi(); 
+            
+            Forecast forecast = accuweatherApi.GetForecastOnDay(city).Result;
+            
+            Assert.NotZero(forecast.Temp);
+            Assert.NotZero(forecast.Humidity);
+            Assert.NotZero(forecast.Pressure);
+        }
+
+
     }
 }
