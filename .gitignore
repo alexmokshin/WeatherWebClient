@@ -3,8 +3,8 @@
 ################################################################################
 
 /.vs
-/WeatherWebApplication/bin/Debug
-/WeatherWebApplication/obj
+WeatherWebApplication/bin/Debug/
+/WeatherWebApplication/obj/
 /WeatherWebApplication.sln.DotSettings.user
 
 
