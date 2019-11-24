@@ -20,6 +20,7 @@ namespace WeatherWebApplication.Core
             this.Token = "A1lsqa8gB6LC3N58eWhrOQA3U4zeLUZ4";
             this.Url = new Uri("http://dataservice.accuweather.com");
             
+            
         }
 
         public override async Task<Forecast> GetForecastOnDay(City city)
@@ -46,6 +47,7 @@ namespace WeatherWebApplication.Core
                         if (response.IsSuccessStatusCode)
                         {
                             var reponseJson = await response.Content.ReadAsStringAsync();
+                            //Преобразуем JSON из респонса в JArray, берем первый объект и обращаемся к его ключам как к полям класса
                             var responseArray = JArray.Parse(reponseJson);
                             dynamic jobject = (JObject) responseArray.FirstOrDefault();
 

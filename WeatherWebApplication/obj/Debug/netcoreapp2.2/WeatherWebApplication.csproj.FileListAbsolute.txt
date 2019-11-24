@@ -57,4 +57,4 @@ C:\Users\moksh\source\repos\WeatherWebApp\WeatherWebApplication\obj\Debug\netcor
 C:\Users\moksh\source\repos\WeatherWebApp\WeatherWebApplication\obj\Debug\netcoreapp2.2\WeatherWebApplication.dll
 C:\Users\moksh\source\repos\WeatherWebApp\WeatherWebApplication\obj\Debug\netcoreapp2.2\WeatherWebApplication.pdb
 C:\Users\moksh\source\repos\WeatherWebApp\WeatherWebApplication\obj\Debug\netcoreapp2.2\WeatherWebApplication.csproj.CopyComplete
-C:\Users\moksh\source\repos\WeatherWebApp\WeatherWebApplication\obj\Debug\netcoreapp2.2\WeatherWebApplication.csprojAssemblyReference.cache
+C:\Users\moksh\source\repos\WeatherWebApp\WeatherWebApplication\obj\Debug\netcoreapp2.2\Razor\Pages\Forecasts.g.cshtml.cs

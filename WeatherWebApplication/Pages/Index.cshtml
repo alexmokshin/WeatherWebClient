@@ -1,33 +1,62 @@
-﻿@model Models.ForecastViewModel
+﻿
+@model Models.ForecastViewModel
 
-
-
-<form asp-action="GetForecast" asp-controller="Home" method="post">
-    <ul>
-
-        @foreach (var city in Model.cities)
-        {
-            <li>
-                <input type="checkbox" asp-for="@city.Selected" id=@city.Name name=@city.Name />
-                <label asp-for="@city.LocalName">@city.LocalName</label>
-            </li>
+<html>
+<head>
+    <script type="text/javascript">
+        function checkInputParams() {
+            var checkedCity = 0;
+            for (let elem of document.getElementById('cityChekboxes').getElementsByTagName('input')) {
+                if (elem.checked == true) {
+                    console.log(elem.name);
+                    checkedCity++;
+                }
+            }
+            if (checkedCity == 0) {
+                console.log(checkedCity);
+                alert("You need checked city");
+            }
+            console.log(checkedCity);
+                
         }
-    </ul>
+    </script>
+</head>
+<body>
+    <form asp-action="GetForecast" asp-controller="Home" method="post" onclick="checkInputParams" >
+        <div id="cityChekboxes">
+            <ul>
 
-    <ul>
-        @foreach (var p in Model.weatherServices)
-        {
-            <li>
-                <input type="checkbox" asp-for="@p.Selected" id=@p name=@p.WeatherApi.WeatherServiceName />
-                <label asp-for="@p.WeatherApi.WeatherServiceName">@p.WeatherApi.WeatherServiceName</label>
-            </li>
-        }
-    </ul>
+                @foreach (var city in Model.cities)
+                {
 
-    <button type="submit">GetForecast</button>
-</form>
+                    <li>
+                        <input type="checkbox" asp-for="@city.Selected" id=cityCheckbox name=@city.Name />
+                        <label asp-for="@city.LocalName">@city.LocalName</label>
+                    </li>
 
-<h2>Где то внизу будет AJAX</h2>
+                }
+
+            </ul>
+        </div>
+
+        <div id="servicesChekboxes">
+            <ul>
+
+                @foreach (var p in Model.weatherServices)
+                {
+                    <li>
+                        <input type="checkbox" asp-for="@p.Selected" id=servicesCheckbox name=@p.WeatherApi.WeatherServiceName />
+                        <label asp-for="@p.WeatherApi.WeatherServiceName">@p.WeatherApi.WeatherServiceName</label>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <button type="submit"  ondblick="checkInputParams">GetForecast </button>
+    </form>
 
 
+    
+</body>
 
+</html>
