@@ -13,6 +13,8 @@ namespace WeatherWebApplication.Core
 
         protected string Token { get; set; }
 
+        public bool ServiceAvailable { get; set; } = true;
+
         public abstract Task<Models.Forecast> GetForecastOnDay(Models.City city);
 
     }

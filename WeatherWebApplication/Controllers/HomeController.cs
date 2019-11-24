@@ -11,7 +11,8 @@ namespace WeatherWebApplication.Controllers
 {
     public class HomeController : Controller
     {
-        private object Mutex = new object();
+        private static Dictionary<Guid,ForecastViewModel> sessionDictionary = new Dictionary<Guid, ForecastViewModel>();
+        
         #region Testing values
         List<City> Cities = new List<City>()
         {
@@ -52,11 +53,36 @@ namespace WeatherWebApplication.Controllers
         // GET: Home
         public ActionResult Index()
         {
+            
+
             ForecastViewModel forecastView = new ForecastViewModel()
             {
                 cities = Cities,
                 weatherServices = WeatherServices
             };
+            Guid requestGuid = Guid.Empty;
+            Guid.TryParse(Request.Cookies["EnteredData"], out requestGuid);
+            if (requestGuid != Guid.Empty)
+            {
+                Response.Cookies.Append("EnteredData", requestGuid.ToString(), new CookieOptions()
+                {
+                    Expires = DateTimeOffset.Now.AddMinutes(30),
+                    IsEssential = true
+                });
+                if (sessionDictionary.ContainsKey(requestGuid))
+                {
+                    return View("\\Pages\\Index.cshtml", sessionDictionary[requestGuid]);
+                }
+            }
+            else
+            {
+                Response.Cookies.Append("EnteredData", Guid.NewGuid().ToString(), new CookieOptions()
+                {
+                    Expires = DateTimeOffset.Now.AddMinutes(30),
+                    IsEssential = true
+                });
+            }
+            
 
             return View("\\Pages\\Index.cshtml", forecastView);
         }
@@ -64,6 +90,8 @@ namespace WeatherWebApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> GetForecast(Dictionary<string,bool> shit)
         {
+            Guid cookieGuid = Guid.Parse(Request.Cookies["EnteredData"]);
+
             var result = shit.Where(item => item.Value == true);
 
             List<Forecast> forecasts = new List<Forecast>();
@@ -85,15 +113,50 @@ namespace WeatherWebApplication.Controllers
                 }
             }
 
+            foreach (var p in from p in Cities from c in selectedCities where c.Name == p.Name select p)
+            {
+                p.Selected = true;
+            }
+
+            foreach (var q in from q in WeatherServices from m in selectedServices where m.WeatherApi.WeatherServiceName == q.WeatherApi.WeatherServiceName select q)
+            {
+                q.Selected = true;
+            }
+
+            if (sessionDictionary.ContainsKey(cookieGuid))
+            {
+                sessionDictionary[cookieGuid] = new ForecastViewModel()
+                {
+                    cities = Cities,
+                    weatherServices = WeatherServices
+                };
+            }
+            else
+            {
+                sessionDictionary.Add(cookieGuid, new ForecastViewModel()
+                {
+                    cities = Cities,
+                    weatherServices = WeatherServices
+                });
+            }
+
+           
             foreach (var p in selectedCities)
             {
                 foreach (var q in selectedServices)
                 {
-                    var forecast = await q.WeatherApi.GetForecastOnDay(p);
-                    lock (Mutex)
+                    Forecast forecast = new Forecast();
+                    try
                     {
-                        forecasts.Add(forecast);
+                        forecast = await q.WeatherApi.GetForecastOnDay(p);
                     }
+                    catch (Core.Exceptions.WeatherApiException)
+                    {
+                        forecast.WeatherApi.ServiceAvailable = false;
+                    }
+                    
+                    
+                    forecasts.Add(forecast);
                 }
             }
 

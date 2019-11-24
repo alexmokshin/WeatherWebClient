@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json.Linq;
@@ -11,8 +12,10 @@ namespace WeatherWebApplication.Core
 {
     public class AccuWeatherApi : WeatherApi
     {
+        
         public AccuWeatherApi() : base()
         {
+            
             this.WeatherServiceName = "AccuWeather";
             this.Token = "A1lsqa8gB6LC3N58eWhrOQA3U4zeLUZ4";
             this.Url = new Uri("http://dataservice.accuweather.com");
@@ -23,31 +26,43 @@ namespace WeatherWebApplication.Core
         {
             if (city == null)
                 throw new Exception("City is not be null");
-
-            Forecast forecast = new Forecast();
-            forecast.city = city;
-            forecast.WeatherApi = this;
-            string cityLocationNumber = GetCityNumber(city).Result;
             
-            using (HttpClient client = new HttpClient())
-            {
-                
-                using (HttpResponseMessage response =
-                    await client.GetAsync(GetForecastUri(cityLocationNumber)))
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var reponseJson = await response.Content.ReadAsStringAsync();
-                        var responseArray = JArray.Parse(reponseJson);
-                        dynamic jobject = (JObject)responseArray.FirstOrDefault();
+            Forecast forecast = new Forecast();
+            
+            var p = GetCityNumber(city);
+            p.Wait();
+            
 
-                        forecast.Temp = (float) jobject.Temperature.Metric.Value;
-                        forecast.Humidity = (float) jobject.RelativeHumidity;
-                        forecast.Pressure = (float) jobject.Pressure.Metric.Value;
+            if (p.IsCompletedSuccessfully && !String.IsNullOrEmpty(p.Result))
+            {
+
+                string cityLocationNumber = p.Result;
+
+                using (HttpClient client = new HttpClient())
+                {
+                    using (HttpResponseMessage response =
+                        await client.GetAsync(GetForecastUri(cityLocationNumber)))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var reponseJson = await response.Content.ReadAsStringAsync();
+                            var responseArray = JArray.Parse(reponseJson);
+                            dynamic jobject = (JObject) responseArray.FirstOrDefault();
+
+                            forecast.Temp = (float) jobject.Temperature.Metric.Value;
+                            forecast.Humidity = (float) jobject.RelativeHumidity;
+                            forecast.Pressure = (float) jobject.Pressure.Metric.Value;
+
+                        }
+                        else
+                        {
+                            throw new Exceptions.WeatherApiException(response);
+                        }
                     }
                 }
             }
-
+            forecast.WeatherApi = this;
+            forecast.city = city;
             return forecast;
         }
 
@@ -87,7 +102,7 @@ namespace WeatherWebApplication.Core
                     }
                     else
                     {
-                        throw new Exceptions.WeatherApiException(response);
+                        this.ServiceAvailable = false;
                     }
                 }
             }

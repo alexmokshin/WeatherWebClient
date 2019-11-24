@@ -5,6 +5,7 @@
         <tr>
             <th>Город</th>
             <th>Сервис погоды</th>
+            <th>Доступность сервиса</th>
             <th>Температура</th>
             <th>Давление</th>
             <th>Влажность</th>
@@ -16,9 +17,20 @@
         <tr>
             <td>@forecast.city.LocalName</td>
             <td>@forecast.WeatherApi.WeatherServiceName</td>
-            <td>@forecast.Temp</td>
-            <td>@forecast.Pressure</td>
-            <td>@forecast.Humidity</td>
+            @if (forecast.WeatherApi.ServiceAvailable == false)
+            {
+                <td>@forecast.WeatherApi.ServiceAvailable</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            }
+            else
+            {
+                <td>@forecast.WeatherApi.ServiceAvailable</td>
+                <td>@forecast.Temp</td>
+                <td>@forecast.Pressure</td>
+                <td>@forecast.Humidity</td>
+            }
         </tr>
     }
     </tbody>
